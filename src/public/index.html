@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17211d">
+  <title>FitClub | Gestion de salle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="FitClub accueil"><span class="brand-mark">F</span><span>FITCLUB<span class="brand-period">.</span></span></a>
+    <div id="session-controls" class="session-controls" hidden>
+      <span id="session-name" class="session-name"></span>
+      <button id="logout-button" class="button button-quiet" type="button">Déconnexion <span aria-hidden="true">↗</span></button>
+    </div>
+  </header>
+
+  <main>
+    <section id="auth-view" class="auth-layout">
+      <div class="auth-copy">
+        <p class="eyebrow">LE CLUB, À VOTRE RYTHME</p>
+        <h1>Votre prochain<br>cours commence ici.</h1>
+        <p class="intro">Retrouvez le planning, gérez votre abonnement et réservez votre place en quelques secondes.</p>
+        <div class="auth-rule"><span></span><span>ENTRAÎNEZ-VOUS ENSEMBLE</span></div>
+      </div>
+      <section class="auth-panel" aria-labelledby="auth-title">
+        <div class="auth-tabs" role="tablist" aria-label="Accès au compte">
+          <button class="auth-tab is-active" type="button" data-auth-mode="login">Connexion</button>
+          <button class="auth-tab" type="button" data-auth-mode="register">Créer un compte</button>
+        </div>
+        <h2 id="auth-title">Ravi de vous revoir.</h2>
+        <p id="auth-subtitle" class="muted">Connectez-vous pour accéder à votre espace.</p>
+        <p id="auth-message" class="message" role="status" hidden></p>
+        <form id="auth-form" class="form-stack">
+          <div id="register-fields" class="form-grid" hidden>
+            <label>Prénom<input name="firstName" autocomplete="given-name" required></label>
+            <label>Nom<input name="lastName" autocomplete="family-name" required></label>
+            <label class="field-wide">Téléphone <span class="optional">(facultatif)</span><input name="phone" autocomplete="tel"></label>
+          </div>
+          <label>Adresse e-mail<input name="email" type="email" autocomplete="email" required></label>
+          <label>Mot de passe<input name="password" type="password" autocomplete="current-password" minlength="8" required></label>
+          <button id="auth-submit" class="button button-primary button-wide" type="submit">Se connecter <span aria-hidden="true">→</span></button>
+        </form>
+      </section>
+    </section>
+
+    <section id="dashboard" class="dashboard" hidden>
+      <div class="page-heading">
+        <div><p class="eyebrow">ESPACE MEMBRE</p><h1>Le planning du club.</h1></div>
+        <p class="intro compact">Choisissez votre séance. Votre place est réservée dès confirmation.</p>
+      </div>
+      <p id="dashboard-message" class="message" role="status" hidden></p>
+      <div class="dashboard-grid">
+        <section class="schedule-section" aria-labelledby="schedule-title">
+          <div class="section-heading"><div><p class="eyebrow">CETTE SEMAINE</p><h2 id="schedule-title">Cours collectifs</h2></div><span id="class-count" class="count-label"></span></div>
+          <div id="classes-list" class="class-list" aria-live="polite"></div>
+        </section>
+        <aside class="member-column">
+          <section class="membership-panel">
+            <p class="eyebrow">VOTRE FORMULE</p>
+            <h2>Abonnement</h2>
+            <div id="membership-content" class="membership-content"><p class="muted">Chargement…</p></div>
+          </section>
+          <section id="admin-panel" class="admin-panel" hidden>
+            <p class="eyebrow">GESTION DU CLUB</p>
+            <h2>Administration</h2>
+            <div id="expiry-alert" class="expiry-alert" hidden></div>
+            <form id="class-form" class="admin-form">
+              <h3>Ajouter un cours</h3>
+              <label>Nom du cours<input name="title" placeholder="Pilates" required minlength="2"></label>
+              <label>Coach<input name="coach" placeholder="Camille Martin" required minlength="2"></label>
+              <div class="form-grid">
+                <label>Date et heure<input name="startsAt" type="datetime-local" required></label>
+                <label>Durée (min)<input name="durationMinutes" type="number" min="15" max="240" value="45" required></label>
+              </div>
+              <label>Places<input name="capacity" type="number" min="1" max="100" value="12" required></label>
+              <button class="button button-dark button-wide" type="submit">Créer le cours <span aria-hidden="true">+</span></button>
+            </form>
+            <form id="member-form" class="admin-form">
+              <h3>Ajouter un adhérent</h3>
+              <div class="form-grid">
+                <label>Prénom<input name="firstName" required></label>
+                <label>Nom<input name="lastName" required></label>
+              </div>
+              <label>E-mail<input name="email" type="email" required></label>
+              <label>Téléphone<input name="phone"></label>
+              <button class="button button-dark button-wide" type="submit">Ajouter l’adhérent <span aria-hidden="true">+</span></button>
+            </form>
+            <form id="subscription-form" class="admin-form">
+              <h3>Créer un abonnement</h3>
+              <label>Adhérent<select name="member" required><option value="">Sélectionner</option></select></label>
+              <div class="form-grid">
+                <label>Début<input name="startDate" type="date" required></label>
+                <label>Durée (mois)<input name="durationMonths" type="number" min="1" max="36" value="3" required></label>
+              </div>
+              <button class="button button-dark button-wide" type="submit">Créer l’abonnement <span aria-hidden="true">+</span></button>
+            </form>
+            <div class="admin-members"><h3>Adhérents</h3><div id="members-list"></div></div>
+          </section>
+        </aside>
+      </div>
+      <footer class="page-footer"><span>FITCLUB <span class="brand-period">.</span></span><span>BOUGEZ À VOTRE FAÇON</span></footer>
+    </section>
+  </main>
+</body>
+</html>
