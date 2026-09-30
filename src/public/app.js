@@ -24,6 +24,15 @@ function showMessage(element, message, success = false) {
   element.classList.toggle('is-success', success);
 }
 
+function updateWithTransition(update) {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion || !document.startViewTransition) {
+    update();
+    return;
+  }
+  document.startViewTransition(update);
+}
+
 async function api(path, options = {}) {
   const headers = { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...options.headers };
   if (state.token) headers.Authorization = `Bearer ${state.token}`;
@@ -35,29 +44,46 @@ async function api(path, options = {}) {
 
 function setAuthMode(mode) {
   state.authMode = mode;
-  const registering = mode === 'register';
-  document.querySelectorAll('[data-auth-mode]').forEach((button) => {
-    button.classList.toggle('is-active', button.dataset.authMode === mode);
+  updateWithTransition(() => {
+    const registering = mode === 'register';
+    document.querySelectorAll('[data-auth-mode]').forEach((button) => {
+      button.classList.toggle('is-active', button.dataset.authMode === mode);
+    });
+    const registerFields = byId('register-fields');
+    registerFields.hidden = !registering;
+    registerFields.querySelectorAll('input').forEach((input) => {
+      input.disabled = !registering;
+      input.required = registering && input.name !== 'phone';
+    });
+    byId('auth-title').textContent = registering ? 'Bienvenue au club.' : 'Ravi de te revoir.';
+    byId('auth-subtitle').textContent = registering
+      ? 'Crée ton espace et prépare ta prochaine séance.'
+      : 'Connecte-toi pour retrouver ton espace.';
+    byId('auth-submit').innerHTML = registering
+      ? 'Créer mon compte <span aria-hidden="true">→</span>'
+      : 'Me connecter <span aria-hidden="true">→</span>';
+    authForm.elements.password.autocomplete = registering ? 'new-password' : 'current-password';
+    showMessage(byId('auth-message'), '');
   });
-  const registerFields = byId('register-fields');
-  registerFields.hidden = !registering;
-  registerFields.querySelectorAll('input').forEach((input) => {
-    input.disabled = !registering;
-    input.required = registering && input.name !== 'phone';
-  });
-  byId('auth-title').textContent = registering ? 'Rejoignez le club.' : 'Ravi de vous revoir.';
-  byId('auth-subtitle').textContent = registering
-    ? 'Créez votre espace membre pour réserver vos cours.'
-    : 'Connectez-vous pour accéder à votre espace.';
-  byId('auth-submit').innerHTML = registering
-    ? 'Créer mon compte <span aria-hidden="true">→</span>'
-    : 'Se connecter <span aria-hidden="true">→</span>';
-  authForm.elements.password.autocomplete = registering ? 'new-password' : 'current-password';
-  showMessage(byId('auth-message'), '');
 }
 
 function formatDate(value, options = { weekday: 'short', day: 'numeric', month: 'short' }) {
   return new Intl.DateTimeFormat('fr-FR', options).format(new Date(value));
+}
+
+function renderOverview() {
+  const upcoming = state.classes.filter((item) => new Date(item.startsAt) > new Date());
+  const nextClass = upcoming.reduce((closest, item) =>
+    !closest || new Date(item.startsAt) < new Date(closest.startsAt) ? item : closest, null);
+  const availableSpots = upcoming.reduce((total, item) =>
+    total + Math.max(0, Number(item.capacity) - Number(item.registeredCount)), 0);
+  const firstName = state.user.name.trim().split(/\s+/)[0];
+
+  byId('welcome-title').textContent = `Bonjour, ${firstName}.`;
+  byId('overview-stats').innerHTML = `
+    <div class="overview-stat"><span class="stat-label">À venir</span><strong>${upcoming.length}</strong><span class="stat-note">séance${upcoming.length > 1 ? 's' : ''} au planning</span></div>
+    <div class="overview-stat stat-highlight"><span class="stat-label">Places disponibles</span><strong>${availableSpots}</strong><span class="stat-note">sur les cours à venir</span></div>
+    <div class="overview-stat"><span class="stat-label">Prochain rendez-vous</span><strong class="next-class-name">${nextClass ? escapeHtml(nextClass.title) : 'À définir'}</strong><span class="stat-note">${nextClass ? escapeHtml(formatDate(nextClass.startsAt, { weekday: 'long', day: 'numeric', month: 'long' })) : 'De nouvelles séances arrivent bientôt'}</span></div>`;
 }
 
 function renderClasses() {
@@ -71,6 +97,7 @@ function renderClasses() {
   list.innerHTML = state.classes.map((groupClass) => {
     const date = new Date(groupClass.startsAt);
     const full = groupClass.registeredCount >= groupClass.capacity;
+    const occupancy = Math.min(100, Math.round((groupClass.registeredCount / groupClass.capacity) * 100));
     const action = state.user.role === 'admin'
       ? `<button class="button button-dark" data-action="delete-class" data-id="${escapeHtml(groupClass.id)}">Supprimer</button>`
       : groupClass.isBooked
@@ -81,7 +108,7 @@ function renderClasses() {
     return `<article class="class-row">
       <div class="class-date"><strong>${escapeHtml(new Intl.DateTimeFormat('fr-FR', { day: '2-digit' }).format(date))}</strong><span>${escapeHtml(new Intl.DateTimeFormat('fr-FR', { month: 'short' }).format(date))} · ${escapeHtml(new Intl.DateTimeFormat('fr-FR', { weekday: 'short' }).format(date))}</span></div>
       <div class="class-details"><h3>${escapeHtml(groupClass.title)}</h3><p class="class-meta">${escapeHtml(new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(date))} · ${escapeHtml(groupClass.durationMinutes)} min · Coach ${escapeHtml(groupClass.coach)}</p></div>
-      <div class="class-action"><span class="spots">${escapeHtml(groupClass.registeredCount)} / ${escapeHtml(groupClass.capacity)} places</span>${action}</div>
+      <div class="class-action"><span class="spots">${escapeHtml(groupClass.registeredCount)} / ${escapeHtml(groupClass.capacity)} places</span><span class="capacity-track" aria-label="${occupancy}% des places réservées"><span style="width: ${occupancy}%"></span></span>${action}</div>
     </article>`;
   }).join('');
 }
@@ -137,18 +164,23 @@ async function refreshDashboard() {
     state.members = members.data;
     state.expiring = expiring.data;
   }
-  renderClasses();
-  renderMembership();
-  renderAdmin();
+  updateWithTransition(() => {
+    renderClasses();
+    renderOverview();
+    renderMembership();
+    renderAdmin();
+  });
 }
 
 async function openDashboard(user) {
   state.user = user;
-  authView.hidden = true;
-  dashboard.hidden = false;
-  byId('session-controls').hidden = false;
-  byId('session-name').textContent = user.role === 'admin' ? `${user.name} · Admin` : user.name;
-  showMessage(byId('dashboard-message'), '');
+  updateWithTransition(() => {
+    authView.hidden = true;
+    dashboard.hidden = false;
+    byId('session-controls').hidden = false;
+    byId('session-name').textContent = user.role === 'admin' ? `${user.name} · Admin` : user.name;
+    showMessage(byId('dashboard-message'), '');
+  });
   await refreshDashboard();
 }
 
@@ -156,9 +188,11 @@ function signOut() {
   state.token = null;
   state.user = null;
   localStorage.removeItem('fitclub-token');
-  dashboard.hidden = true;
-  authView.hidden = false;
-  byId('session-controls').hidden = true;
+  updateWithTransition(() => {
+    dashboard.hidden = true;
+    authView.hidden = false;
+    byId('session-controls').hidden = true;
+  });
 }
 
 document.querySelectorAll('[data-auth-mode]').forEach((button) => {

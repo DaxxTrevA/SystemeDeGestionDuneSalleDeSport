@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#17211d">
+  <meta name="theme-color" content="#2452f3">
   <title>FitClub | Gestion de salle</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
 </head>
@@ -23,17 +23,18 @@
   <main>
     <section id="auth-view" class="auth-layout">
       <div class="auth-copy">
-        <p class="eyebrow">LE CLUB, À VOTRE RYTHME</p>
-        <h1>Votre prochain<br>cours commence ici.</h1>
-        <p class="intro">Retrouvez le planning, gérez votre abonnement et réservez votre place en quelques secondes.</p>
-        <div class="auth-rule"><span></span><span>ENTRAÎNEZ-VOUS ENSEMBLE</span></div>
+        <p class="eyebrow">FITCLUB · LE SPORT EN COLLECTIF</p>
+        <h1>Le sport, c’est<br>mieux ensemble.</h1>
+        <p class="intro">Trouve ton prochain cours, réserve ta place et retrouve l’énergie du groupe.</p>
+        <div class="auth-rule"><span></span><span>TON CLUB. TON RYTHME.</span></div>
       </div>
       <section class="auth-panel" aria-labelledby="auth-title">
         <div class="auth-tabs" role="tablist" aria-label="Accès au compte">
           <button class="auth-tab is-active" type="button" data-auth-mode="login">Connexion</button>
           <button class="auth-tab" type="button" data-auth-mode="register">Créer un compte</button>
         </div>
-        <h2 id="auth-title">Ravi de vous revoir.</h2>
+        <p class="eyebrow auth-kicker">TON ESPACE FITCLUB</p>
+        <h2 id="auth-title">Ravi de te revoir.</h2>
         <p id="auth-subtitle" class="muted">Connectez-vous pour accéder à votre espace.</p>
         <p id="auth-message" class="message" role="status" hidden></p>
         <form id="auth-form" class="form-stack">
@@ -51,13 +52,14 @@
 
     <section id="dashboard" class="dashboard" hidden>
       <div class="page-heading">
-        <div><p class="eyebrow">ESPACE MEMBRE</p><h1>Le planning du club.</h1></div>
-        <p class="intro compact">Choisissez votre séance. Votre place est réservée dès confirmation.</p>
+        <div><p class="eyebrow">FITCLUB · TON ESPACE</p><h1 id="welcome-title">Le planning du club.</h1></div>
+        <p class="intro compact">Les prochains cours, les places libres et ton abonnement. Tout est là.</p>
       </div>
+      <section id="overview-stats" class="overview-stats" aria-label="Résumé du planning" aria-live="polite"></section>
       <p id="dashboard-message" class="message" role="status" hidden></p>
       <div class="dashboard-grid">
         <section class="schedule-section" aria-labelledby="schedule-title">
-          <div class="section-heading"><div><p class="eyebrow">CETTE SEMAINE</p><h2 id="schedule-title">Cours collectifs</h2></div><span id="class-count" class="count-label"></span></div>
+          <div class="section-heading"><div><p class="eyebrow">À TON AGENDA</p><h2 id="schedule-title">Les prochains cours</h2></div><span id="class-count" class="count-label"></span></div>
           <div id="classes-list" class="class-list" aria-live="polite"></div>
         </section>
         <aside class="member-column">
