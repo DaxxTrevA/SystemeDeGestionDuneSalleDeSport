@@ -4,7 +4,9 @@ import helmet from 'helmet';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import authRoutes from './routes/authRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 import classRoutes from './routes/classRoutes.js';
+import clubSettingsRoutes from './routes/clubSettingsRoutes.js';
 import memberRoutes from './routes/memberRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import { errorHandler, notFound } from './utils/errors.js';
@@ -20,9 +22,11 @@ app.use(express.static(publicDirectory));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', authRoutes);
+app.use('/api/admins', adminRoutes);
 app.use('/api/members', memberRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/classes', classRoutes);
+app.use('/api/club-settings', clubSettingsRoutes);
 app.use(notFound);
 app.use(errorHandler);
 

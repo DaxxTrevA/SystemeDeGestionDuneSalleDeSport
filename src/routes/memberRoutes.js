@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { createMember, deleteMember, getMember, listMembers, updateMember } from '../controllers/memberController.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
-import { memberSchema } from '../validators/schemas.js';
+import { deleteMemberSchema, memberSchema } from '../validators/schemas.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 const router = Router();
@@ -13,6 +13,6 @@ router.route('/')
 router.route('/:id')
   .get(asyncHandler(getMember))
   .put(validate(memberSchema), asyncHandler(updateMember))
-  .delete(asyncHandler(deleteMember));
+  .delete(validate(deleteMemberSchema), asyncHandler(deleteMember));
 
 export default router;

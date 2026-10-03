@@ -5,7 +5,9 @@ const subscriptionSchema = new mongoose.Schema({
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   durationMonths: { type: Number, required: true, min: 1, max: 36 },
-  status: { type: String, enum: ['active', 'expired', 'suspended'], default: 'active', index: true }
+  monthlyRateAr: { type: Number, min: 0, default: 0 },
+  totalPriceAr: { type: Number, min: 0, default: 0 },
+  status: { type: String, enum: ['pending', 'active', 'expired', 'suspended', 'rejected'], default: 'active', index: true }
 }, { timestamps: true });
 
 export default mongoose.model('Subscription', subscriptionSchema);

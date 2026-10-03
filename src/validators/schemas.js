@@ -28,7 +28,11 @@ export const subscriptionSchema = z.object({
   member: z.string().regex(/^[a-f\d]{24}$/i),
   startDate: date,
   durationMonths: z.coerce.number().int().min(1).max(36),
-  status: z.enum(['active', 'expired', 'suspended']).optional().default('active')
+  status: z.enum(['pending', 'active', 'expired', 'suspended', 'rejected']).optional().default('active')
+});
+
+export const subscriptionRequestSchema = z.object({
+  durationMonths: z.coerce.number().int().min(1).max(36)
 });
 
 export const groupClassSchema = z.object({
@@ -37,4 +41,29 @@ export const groupClassSchema = z.object({
   startsAt: date,
   durationMinutes: z.coerce.number().int().min(15).max(240),
   capacity: z.coerce.number().int().min(1).max(100)
+});
+
+const presetList = z.array(z.string().trim().min(2).max(60)).min(1).max(30)
+  .refine((values) => new Set(values.map((value) => value.toLowerCase())).size === values.length);
+
+export const clubSettingsSchema = z.object({
+  courseTypes: presetList,
+  coaches: presetList,
+  monthlyPriceAr: z.coerce.number().int().min(1000).max(10000000).default(22000)
+});
+
+export const createAdminSchema = z.object({
+  name: z.string().trim().min(2).max(100),
+  email,
+  password
+});
+
+export const adminCredentialsSchema = z.object({
+  currentPassword: z.string().min(1).max(72),
+  email: email.optional(),
+  newPassword: password.optional()
+}).refine(({ email: nextEmail, newPassword }) => Boolean(nextEmail || newPassword));
+
+export const deleteMemberSchema = z.object({
+  adminPassword: z.string().min(1).max(72)
 });

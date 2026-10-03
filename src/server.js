@@ -29,7 +29,7 @@ async function start() {
   setInterval(() => runSubscriptionAlerts().catch(console.error), 24 * 60 * 60 * 1000).unref();
 
   const port = Number(process.env.PORT) || 3000;
-  app.listen(port, () => console.log(`FitClub disponible sur http://localhost:${port}`));
+  app.listen(port, () => console.log(`ITAOSYclub disponible sur http://localhost:${port}`));
 }
 
 start().catch((error) => {

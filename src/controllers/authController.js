@@ -24,13 +24,25 @@ export async function register(req, res) {
   const { name, firstName, lastName, email, password, phone, dateOfBirth } = req.body;
   if (await User.exists({ email })) throw new AppError('Cette adresse e-mail est déjà utilisée.', 409);
 
-  const member = await Member.create({ firstName, lastName, email, phone, dateOfBirth });
+  let member = await Member.findOne({ email });
+  const createdMember = !member;
+  if (member && await User.exists({ member: member.id })) {
+    throw new AppError('Ce profil adhérent possède déjà un compte.', 409);
+  }
+  if (!member) member = await Member.create({ firstName, lastName, email, phone, dateOfBirth });
+  else {
+    member.firstName = firstName;
+    member.lastName = lastName;
+    member.phone = phone;
+    member.dateOfBirth = dateOfBirth;
+    await member.save();
+  }
   try {
     const passwordHash = await bcrypt.hash(password, 12);
     const user = await User.create({ name, email, passwordHash, member: member.id });
     res.status(201).json({ token: createToken(user), user: userResponse(user) });
   } catch (error) {
-    await Member.findByIdAndDelete(member.id);
+    if (createdMember) await Member.findByIdAndDelete(member.id);
     throw error;
   }
 }

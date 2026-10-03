@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#2452f3">
-  <title>FitClub | Gestion de salle</title>
+  <meta name="theme-color" content="#e94f1d">
+  <title>ITAOSYclub | Le club bouge</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,27 +13,76 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="/" aria-label="FitClub accueil"><span class="brand-mark">F</span><span>FITCLUB<span class="brand-period">.</span></span></a>
+    <a class="brand" href="/" aria-label="ITAOSYclub accueil"><span class="brand-mark">I</span><span>ITAOSY<span class="brand-club">club</span><span class="brand-period">.</span></span></a>
     <div id="session-controls" class="session-controls" hidden>
+      <button id="admin-notification-button" class="notification-button" type="button" aria-label="Demandes d’abonnement" hidden>Demandes <span id="notification-count">0</span></button>
+      <button id="admin-menu-button" class="menu-button" type="button" aria-label="Ouvrir les réglages admin" aria-expanded="false" aria-controls="admin-drawer" hidden><span class="menu-lines" aria-hidden="true"><span></span><span></span><span></span></span></button>
       <span id="session-name" class="session-name"></span>
       <button id="logout-button" class="button button-quiet" type="button">Déconnexion <span aria-hidden="true">↗</span></button>
     </div>
   </header>
 
+  <button id="drawer-backdrop" class="drawer-backdrop" type="button" aria-label="Fermer les réglages" tabindex="-1"></button>
+  <aside id="admin-drawer" class="admin-drawer" aria-label="Réglages et accès administrateur" aria-hidden="true" inert>
+    <header class="drawer-header">
+      <div><p class="eyebrow">ITAOSYCLUB · RÉGLAGES</p><h2>Ton espace admin</h2></div>
+      <button id="close-admin-drawer" class="drawer-close" type="button" aria-label="Fermer les réglages">×</button>
+    </header>
+    <div class="drawer-content">
+      <p id="drawer-message" class="message" role="status" hidden></p>
+      <section class="drawer-section">
+        <h3>Identifiants du compte</h3>
+        <form id="admin-settings-form" class="drawer-form">
+          <label>Adresse e-mail<input name="email" type="email" autocomplete="username" required></label>
+          <label>Mot de passe actuel<input name="currentPassword" type="password" autocomplete="current-password" required></label>
+          <label>Nouveau mot de passe <span class="optional">(facultatif)</span><input name="newPassword" type="password" autocomplete="new-password" minlength="8" maxlength="72" placeholder="8 caractères minimum"></label>
+          <button class="button button-primary button-wide" type="submit">Enregistrer les identifiants</button>
+        </form>
+      </section>
+      <section class="drawer-section">
+        <h3>Offre d’abonnement</h3>
+        <p class="drawer-note">Tarif mensuel utilisé pour les nouvelles demandes. Les demandes déjà reçues gardent leur prix.</p>
+        <form id="offer-settings-form" class="drawer-form">
+          <label>Prix par mois (Ar)<input name="monthlyPriceAr" type="number" min="1000" max="10000000" step="1000" required></label>
+          <button class="button button-dark button-wide" type="submit">Enregistrer le tarif</button>
+        </form>
+      </section>
+      <section id="admin-notifications-section" class="drawer-section">
+        <h3>Demandes d’abonnement <span id="drawer-notification-count" class="member-count"></span></h3>
+        <p id="admin-notifications-empty" class="drawer-note">Aucune nouvelle demande.</p>
+        <ul id="admin-notifications" class="admins-list" aria-live="polite"></ul>
+      </section>
+      <section class="drawer-section">
+        <h3>Accès rapides admins</h3>
+        <p class="drawer-note">Choisis un compte, puis saisis son mot de passe pour te connecter.</p>
+        <ul id="admins-list" class="admins-list" aria-live="polite"></ul>
+      </section>
+      <section class="drawer-section">
+        <h3>Ajouter un administrateur</h3>
+        <form id="create-admin-form" class="drawer-form">
+          <label>Nom complet<input name="name" autocomplete="name" minlength="2" maxlength="100" required></label>
+          <label>Adresse e-mail<input name="email" type="email" autocomplete="email" required></label>
+          <label>Mot de passe initial<input name="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" required></label>
+          <button class="button button-dark button-wide" type="submit">Créer l’administrateur</button>
+        </form>
+      </section>
+    </div>
+  </aside>
+
   <main>
     <section id="auth-view" class="auth-layout">
       <div class="auth-copy">
-        <p class="eyebrow">FITCLUB · LE SPORT EN COLLECTIF</p>
-        <h1>Le sport, c’est<br>mieux ensemble.</h1>
-        <p class="intro">Trouve ton prochain cours, réserve ta place et retrouve l’énergie du groupe.</p>
-        <div class="auth-rule"><span></span><span>TON CLUB. TON RYTHME.</span></div>
+        <p class="eyebrow">ITAOSYCLUB · LE CLUB QUI BOUGE</p>
+        <h1>Plus d’énergie.<br>Plus de club.</h1>
+        <p class="intro">Choisis ta séance, retrouve ton équipe et fais de chaque entraînement un rendez-vous.</p>
+        <div class="auth-rule"><span></span><span>ON BOUGE. ON PROGRESSE.</span></div>
       </div>
       <section class="auth-panel" aria-labelledby="auth-title">
         <div class="auth-tabs" role="tablist" aria-label="Accès au compte">
           <button class="auth-tab is-active" type="button" data-auth-mode="login">Connexion</button>
           <button class="auth-tab" type="button" data-auth-mode="register">Créer un compte</button>
         </div>
-        <p class="eyebrow auth-kicker">TON ESPACE FITCLUB</p>
+        <p class="eyebrow auth-kicker">TON ESPACE ITAOSYCLUB</p>
         <h2 id="auth-title">Ravi de te revoir.</h2>
         <p id="auth-subtitle" class="muted">Connectez-vous pour accéder à votre espace.</p>
         <p id="auth-message" class="message" role="status" hidden></p>
@@ -52,8 +101,8 @@
 
     <section id="dashboard" class="dashboard" hidden>
       <div class="page-heading">
-        <div><p class="eyebrow">FITCLUB · TON ESPACE</p><h1 id="welcome-title">Le planning du club.</h1></div>
-        <p class="intro compact">Les prochains cours, les places libres et ton abonnement. Tout est là.</p>
+        <div><p class="eyebrow">ITAOSYCLUB · TON ESPACE</p><h1 id="welcome-title">Le planning du club.</h1></div>
+        <p class="intro compact">Tes séances, tes places et ton abonnement. Prêt à bouger ?</p>
       </div>
       <section id="overview-stats" class="overview-stats" aria-label="Résumé du planning" aria-live="polite"></section>
       <p id="dashboard-message" class="message" role="status" hidden></p>
@@ -63,9 +112,9 @@
           <div id="classes-list" class="class-list" aria-live="polite"></div>
         </section>
         <aside class="member-column">
-          <section class="membership-panel">
+          <section id="membership-panel" class="membership-panel">
             <p class="eyebrow">VOTRE FORMULE</p>
-            <h2>Abonnement</h2>
+            <div class="membership-title-row"><h2>Abonnement</h2><span id="premium-badge" class="premium-badge" hidden>PREMIUM</span></div>
             <div id="membership-content" class="membership-content"><p class="muted">Chargement…</p></div>
           </section>
           <section id="admin-panel" class="admin-panel" hidden>
@@ -73,18 +122,47 @@
             <h2>Administration</h2>
             <div id="expiry-alert" class="expiry-alert" hidden></div>
             <form id="class-form" class="admin-form">
-              <h3>Ajouter un cours</h3>
-              <label>Nom du cours<input name="title" placeholder="Pilates" required minlength="2"></label>
-              <label>Coach<input name="coach" placeholder="Camille Martin" required minlength="2"></label>
+              <h3 id="class-form-title">Planifier une séance</h3>
+              <label>Activité
+                <select name="titlePreset" required><option value="">Choisir une activité</option></select>
+                <input name="customTitle" placeholder="Nom de l’activité" maxlength="100" hidden disabled>
+              </label>
+              <label>Coach
+                <select name="coachPreset" required><option value="">Choisir un coach</option></select>
+                <input name="customCoach" placeholder="Nom du coach" maxlength="100" hidden disabled>
+              </label>
               <div class="form-grid">
                 <label>Date et heure<input name="startsAt" type="datetime-local" required></label>
                 <label>Durée (min)<input name="durationMinutes" type="number" min="15" max="240" value="45" required></label>
               </div>
               <label>Places<input name="capacity" type="number" min="1" max="100" value="12" required></label>
-              <button class="button button-dark button-wide" type="submit">Créer le cours <span aria-hidden="true">+</span></button>
+              <button id="class-submit" class="button button-dark button-wide" type="submit">Ajouter au planning <span aria-hidden="true">+</span></button>
+              <button id="cancel-class-edit" class="button button-secondary button-wide" type="button" hidden>Quitter la modification</button>
             </form>
+            <details class="preset-manager">
+              <summary>Gérer les activités et les coachs</summary>
+              <div class="preset-manager-grid" id="preset-lists">
+                <section>
+                  <h4>Activités proposées</h4>
+                  <ul id="course-type-presets" class="preset-list"></ul>
+                  <form id="course-type-form" class="preset-add-form">
+                    <label for="new-course-type">Nouvelle activité</label>
+                    <div><input id="new-course-type" name="presetName" minlength="2" maxlength="60" placeholder="Ex. Spinning" required><button class="button button-primary" type="submit">Ajouter</button></div>
+                  </form>
+                </section>
+                <section>
+                  <h4>Équipe coaching</h4>
+                  <ul id="coach-presets" class="preset-list"></ul>
+                  <form id="coach-form" class="preset-add-form">
+                    <label for="new-coach">Nouveau coach</label>
+                    <div><input id="new-coach" name="presetName" minlength="2" maxlength="60" placeholder="Nom du coach" required><button class="button button-primary" type="submit">Ajouter</button></div>
+                  </form>
+                </section>
+              </div>
+            </details>
             <form id="member-form" class="admin-form">
               <h3>Ajouter un adhérent</h3>
+              <p class="admin-help-text">Il pourra créer son accès avec cette adresse e-mail.</p>
               <div class="form-grid">
                 <label>Prénom<input name="firstName" required></label>
                 <label>Nom<input name="lastName" required></label>
@@ -102,12 +180,29 @@
               </div>
               <button class="button button-dark button-wide" type="submit">Créer l’abonnement <span aria-hidden="true">+</span></button>
             </form>
-            <div class="admin-members"><h3>Adhérents</h3><div id="members-list"></div></div>
+            <details class="admin-members">
+              <summary>Gérer les adhérents <span id="member-count" class="member-count"></span></summary>
+              <p class="member-manager-note">La suppression d’un adhérent retire aussi son compte et ses réservations.</p>
+              <div id="members-list"></div>
+            </details>
           </section>
         </aside>
       </div>
-      <footer class="page-footer"><span>FITCLUB <span class="brand-period">.</span></span><span>BOUGEZ À VOTRE FAÇON</span></footer>
+      <footer class="page-footer"><span>ITAOSYclub <span class="brand-period">.</span></span><span>ON BOUGE. ON PROGRESSE.</span></footer>
     </section>
   </main>
+  <dialog id="delete-member-dialog" class="delete-member-dialog" aria-labelledby="delete-member-title">
+    <form id="delete-member-form" class="delete-member-form">
+      <p class="eyebrow">CONFIRMATION ADMIN</p>
+      <h2 id="delete-member-title">Supprimer cet adhérent ?</h2>
+      <p id="delete-member-description" class="delete-member-description"></p>
+      <label>Ton mot de passe administrateur<input name="adminPassword" type="password" autocomplete="current-password" required></label>
+      <p id="delete-member-message" class="message" role="status" hidden></p>
+      <div class="delete-member-actions">
+        <button id="cancel-member-delete" class="button button-secondary" type="button">Annuler</button>
+        <button class="button button-danger" type="submit">Supprimer définitivement</button>
+      </div>
+    </form>
+  </dialog>
 </body>
 </html>
